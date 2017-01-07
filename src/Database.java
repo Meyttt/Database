@@ -8,19 +8,21 @@ import java.util.Scanner;
  */
 public class Database extends HashMap<String,PersonInformation> implements Serializable{
     String name;
-    public Database() {
+    public Database(String name) {
         super();
+        this.name = name;
     }
-    public Database (String filename) throws IOException, ClassNotFoundException {
+    public Database (String filename, String name) throws IOException, ClassNotFoundException {
         super();
-        this.name=filename;
+        this.name=name;
+        filename=filename+".txt";
         FileInputStream fileInputStream = new FileInputStream("data/"+filename);
         ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            Database database = (Database) objectInputStream.readObject();
+        Database database = (Database) objectInputStream.readObject();
         this.putAll(database);
     }
     public void endWork(String filename) throws IOException {
-        FileOutputStream fileOutputStream = new FileOutputStream(filename);
+        FileOutputStream fileOutputStream = new FileOutputStream("data/"+filename);
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
         objectOutputStream.writeObject(this);
     }
@@ -35,6 +37,7 @@ public class Database extends HashMap<String,PersonInformation> implements Seria
             }else{
                 if(nextLine.equals("0")){
                     database=createDatabase();
+                    break;
                 }else{
                     System.out.println("Please, enter the database name");
                     String filename = scanner.nextLine();
@@ -45,7 +48,7 @@ public class Database extends HashMap<String,PersonInformation> implements Seria
                         return;
                     }
                     try{
-                        database=new Database(filename);
+                        database=new Database(filename,filename);
                     }catch (FileNotFoundException e){
                         System.err.println("File not found!");
                         return;
@@ -86,13 +89,14 @@ public class Database extends HashMap<String,PersonInformation> implements Seria
         }
 
     }
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+        Database database= new Database("database");
+        database.put("1", new PersonInformation("Thomas","Anderson","The Matrix"));
+        database.endWork("database.txt");
+        Thread.sleep(1000);
+        Database database1 = new Database("database","database");
+        System.out.println(database1.get("1").toString("1"));
         communication();
-//        Database database= new Database();
-//        database.put("1", new PersonInformation("Thomas","Anderson","The Matrix"));
-//        database.endWork("database.txt");
-//
-//        Database database1 = new Database("database.txt");
-//        System.out.println(database1.get("1").toString("1"));
+
     }
 }
